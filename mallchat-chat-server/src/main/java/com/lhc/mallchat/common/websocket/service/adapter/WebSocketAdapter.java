@@ -26,6 +26,7 @@ public class WebSocketAdapter {
         return resp;
     }
 
+    //登录成功
     public static WSBaseResp<?> buildResp(User user, String token) {
         WSBaseResp<WSLoginSuccess> resp = new WSBaseResp<>();
         resp.setType(WSRespTypeEnum.LOGIN_SUCCESS.getType());
@@ -38,9 +39,17 @@ public class WebSocketAdapter {
         return resp;
     }
 
+    //用户扫描成功等待授权
     public static WSBaseResp<?> buildWaitAuthorizeResp() {
         WSBaseResp<WSLoginSuccess> resp = new WSBaseResp<>();
         resp.setType(WSRespTypeEnum.LOGIN_SCAN_SUCCESS.getType());
+        return resp;
+    }
+
+    //token失效
+    public static WSBaseResp<?> buildInvalidTokenResp() {
+        WSBaseResp<WSLoginSuccess> resp = new WSBaseResp<>();
+        resp.setType(WSRespTypeEnum.INVALIDATE_TOKEN.getType());
         return resp;
     }
 }

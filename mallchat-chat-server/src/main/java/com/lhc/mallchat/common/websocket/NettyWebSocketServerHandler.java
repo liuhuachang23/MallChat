@@ -13,6 +13,9 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.util.Attribute;
+import io.netty.util.AttributeKey;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @ClassName NettyWebSocketServerHandler
@@ -39,14 +42,19 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
 
     @Override
     public  void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
-        if (evt instanceof WebSocketServerProtocolHandler.HandshakeComplete) {
+        if (evt instanceof WebSocketServerProtocolHandler.HandshakeComplete) { //握手完成事件
             System.out.println("握手完成");
-        } else if (evt instanceof IdleStateEvent) {
+            //从channel的attr中取出token，进行握手认证
+            String token = NettyUtil.getAttr(ctx.channel(), NettyUtil.TOKEN);
+            if (StringUtils.isNotEmpty(token)){
+                webSocketService.authorize(ctx.channel(),token);
+            }
+        } else if (evt instanceof IdleStateEvent) { //用户下线事件
             IdleStateEvent event = (IdleStateEvent) evt;
             if (event.state() == IdleState.READER_IDLE){
                 System.out.println("读空闲");
-                //todo 用户下线
-                ctx.channel().close();
+                //用户下线
+                userOffline(ctx.channel());
             }
         }
     }
@@ -66,6 +74,7 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
         WSBaseReq wsBaseReq = JSONUtil.toBean(text, WSBaseReq.class);
         switch (WSReqTypeEnum.of(wsBaseReq.getType())){
             case AUTHORIZE:
+                webSocketService.authorize(ctx.channel(),wsBaseReq.getData());
                 break;
             case HEARTBEAT:
                 break;

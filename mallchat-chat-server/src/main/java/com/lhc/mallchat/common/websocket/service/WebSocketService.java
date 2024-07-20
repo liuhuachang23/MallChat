@@ -20,4 +20,6 @@ public interface WebSocketService {
     void scanLoginSuccess(Integer code, Long uid);
 
     void withAuthorize(Integer code);
+
+    void authorize(Channel channel, String token);
 }
