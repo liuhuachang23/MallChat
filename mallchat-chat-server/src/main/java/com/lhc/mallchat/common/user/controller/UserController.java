@@ -6,6 +6,7 @@ import com.lhc.mallchat.common.common.domain.vo.resp.ApiResult;
 import com.lhc.mallchat.common.common.utils.RequestHolder;
 import com.lhc.mallchat.common.user.dao.UserDao;
 import com.lhc.mallchat.common.user.domain.entity.User;
+import com.lhc.mallchat.common.user.domain.vo.req.ModifyNameReq;
 import com.lhc.mallchat.common.user.domain.vo.resp.UserInfoResp;
 import com.lhc.mallchat.common.user.service.IUserService;
 import io.swagger.annotations.Api;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 /**
  * <p>
@@ -38,6 +40,13 @@ public class UserController {
     @ApiOperation("用户详情")
     public ApiResult<UserInfoResp> userInfo() {
         return ApiResult.success(userService.getUserInfo(RequestHolder.get().getUid()));
+    }
+
+    @PutMapping("/name")
+    @ApiOperation("修改用户名")
+    public ApiResult<Void> modifyName(@Valid @RequestBody ModifyNameReq req) {
+        userService.modifyName(RequestHolder.get().getUid(), req);
+        return ApiResult.success();
     }
 }
 

@@ -2,6 +2,7 @@ package com.lhc.mallchat.common.user.service;
 
 import com.lhc.mallchat.common.user.domain.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.lhc.mallchat.common.user.domain.vo.req.ModifyNameReq;
 import com.lhc.mallchat.common.user.domain.vo.resp.UserInfoResp;
 
 /**
@@ -17,4 +18,6 @@ public interface IUserService {
     Long register(User insert);
 
     UserInfoResp getUserInfo(Long uid);
+
+    void modifyName(Long uid, ModifyNameReq req);
 }
