@@ -87,7 +87,7 @@ public class WXMsgServiceImpl implements WXMsgService {
         webSocketService.withAuthorize(code); //给微信发送一个 等待授权的消息
         //推送链接给用户授权
         String authorizeUrl = String.format(URL, wxMpService.getWxMpConfigStorage().getAppId(), URLEncoder.encode(callback + "/wx/portal/public/callBack"));
-        return TextBuilder.build("请点击登录："+ "</a href=\"" + authorizeUrl + "\">登录</a>",wxMpXmlMessage);
+        return TextBuilder.build("请点击链接授权：<a href=\"" + authorizeUrl + "\">登录</a>", wxMpXmlMessage);
 
     }
 
