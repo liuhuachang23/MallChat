@@ -21,6 +21,7 @@ public class ScanHandler extends AbstractHandler {
     @Autowired
     private WXMsgService wxMsgService;
 
+    //后续的微信扫码登录会进入这里
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMpXmlMessage, Map<String, Object> map,
                                     WxMpService wxMpService, WxSessionManager wxSessionManager) throws WxErrorException {

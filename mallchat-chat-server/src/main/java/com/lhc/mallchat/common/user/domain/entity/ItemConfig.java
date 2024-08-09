@@ -10,8 +10,10 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import java.util.Date;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * <p>
@@ -49,7 +51,7 @@ public class ItemConfig implements Serializable {
     /**
      * 物品功能描述
      */
-    @TableField("describe")
+    @TableField("`describe`")
     private String describe;
 
     /**

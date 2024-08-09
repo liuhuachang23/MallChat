@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 /**
+ * 关注公众号
  * @author <a href="https://github.com/binarywang">Binary Wang</a>
  */
 @Component
@@ -22,6 +23,7 @@ public class SubscribeHandler extends AbstractHandler {
     @Autowired
     private WXMsgService wxMsgService;
 
+    //第一次微信扫码关注公众号 会进入这里
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,
                                     Map<String, Object> context, WxMpService weixinService,

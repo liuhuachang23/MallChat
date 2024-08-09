@@ -33,13 +33,14 @@ public class WxPortalController {
     @Autowired
     private WXMsgService wxMsgService;
 
-    @GetMapping("/test")
-    public String getQrCode(@RequestParam Integer code) throws WxErrorException {
-        WxMpQrCodeTicket wxMpQrCodeTicket = wxService.getQrcodeService().qrCodeCreateTmpTicket(code, 2000);
-        String url = wxMpQrCodeTicket.getUrl();
-        System.out.println(url);
-        return url;
-    }
+//    //测试 向微信申请待参二维码
+//    @GetMapping("/test")
+//    public String getQrCode(@RequestParam Integer code) throws WxErrorException {
+//        WxMpQrCodeTicket wxMpQrCodeTicket = wxService.getQrcodeService().qrCodeCreateTmpTicket(code, 2000);
+//        String url = wxMpQrCodeTicket.getUrl();
+//        System.out.println(url);
+//        return url;
+//    }
 
     @GetMapping(produces = "text/plain;charset=utf-8")
     public String authGet(@RequestParam(name = "signature", required = false) String signature,

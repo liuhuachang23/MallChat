@@ -80,7 +80,7 @@ public class NettyWebSocketServer {
                         pipeline.addLast(new HttpObjectAggregator(8192));
                         //保存用户ip
 //                        pipeline.addLast(new HttpHeadersHandler());
-                        //保存请求头
+                        //添加一个处理器，收集请求头中的信息（如 token、ip）
                         pipeline.addLast(new MyHeaderCollectHandler());
                         /**
                          * 说明：

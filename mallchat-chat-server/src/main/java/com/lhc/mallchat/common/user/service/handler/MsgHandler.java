@@ -1,19 +1,11 @@
 package com.lhc.mallchat.common.user.service.handler;
 
-import cn.hutool.json.JSONUtil;
-import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.common.session.WxSessionManager;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
-import me.chanjar.weixin.mp.bean.message.WxMpXmlOutDeviceMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.util.Map;
-
-import static me.chanjar.weixin.common.api.WxConsts.XmlMsgType;
 
 /**
  * @author <a href="https://github.com/binarywang">Binary Wang</a>

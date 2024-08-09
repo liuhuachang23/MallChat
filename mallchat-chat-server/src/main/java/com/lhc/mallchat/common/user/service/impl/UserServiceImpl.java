@@ -1,20 +1,31 @@
 package com.lhc.mallchat.common.user.service.impl;
 
+import com.lhc.App;
+import com.lhc.mallchat.common.common.event.UserRegisterEvent;
 import com.lhc.mallchat.common.common.utils.AssertUtil;
-import com.lhc.mallchat.common.common.utils.sensitiveWord.SensitiveWordBs;
+import com.lhc.mallchat.common.user.dao.ItemConfigDao;
 import com.lhc.mallchat.common.user.dao.UserBackpackDao;
 import com.lhc.mallchat.common.user.dao.UserDao;
+import com.lhc.mallchat.common.user.domain.entity.ItemConfig;
 import com.lhc.mallchat.common.user.domain.entity.User;
 import com.lhc.mallchat.common.user.domain.entity.UserBackpack;
 import com.lhc.mallchat.common.user.domain.enums.ItemEnum;
+import com.lhc.mallchat.common.user.domain.enums.ItemTypeEnum;
 import com.lhc.mallchat.common.user.domain.vo.req.ModifyNameReq;
+import com.lhc.mallchat.common.user.domain.vo.req.WearingBadgeReq;
+import com.lhc.mallchat.common.user.domain.vo.resp.BadgeResp;
 import com.lhc.mallchat.common.user.domain.vo.resp.UserInfoResp;
-import com.lhc.mallchat.common.user.mapper.UserMapper;
 import com.lhc.mallchat.common.user.service.IUserService;
 import com.lhc.mallchat.common.user.service.adapter.UserAdapter;
+import com.lhc.mallchat.common.user.service.cache.ItemCache;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName IUserServiceImpl
@@ -31,12 +42,18 @@ public class UserServiceImpl implements IUserService {
     @Autowired
     private UserBackpackDao userBackpackDao;
     @Autowired
-    private SensitiveWordBs sensitiveWordBs;
+    private ItemCache itemCache;
+    @Autowired
+    private ItemConfigDao itemConfigDao;
+
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public Long register(User insert) {
         boolean save = userDao.save(insert);
-        //todo 用户注册的事件
+        //用户注册的事件
+        applicationEventPublisher.publishEvent(new UserRegisterEvent(this,insert));
         return insert.getId();
     }
 
@@ -52,7 +69,7 @@ public class UserServiceImpl implements IUserService {
     public void modifyName(Long uid, ModifyNameReq req) {
         //判断名字是不是重复
         String newName = req.getName();
-        AssertUtil.isFalse(sensitiveWordBs.hasSensitiveWord(newName), "名字中包含敏感词，请重新输入"); // 判断名字中有没有敏感词
+        //AssertUtil.isFalse(sensitiveWordBs.hasSensitiveWord(newName), "名字中包含敏感词，请重新输入"); // 判断名字中有没有敏感词
         User oldUser = userDao.getByName(newName);
         AssertUtil.isEmpty(oldUser, "名字已经被抢占了，请换一个哦~~");
         //判断改名卡够不够
@@ -64,7 +81,32 @@ public class UserServiceImpl implements IUserService {
             //改名
             userDao.modifyName(uid, req.getName());
             //删除缓存
-            userCache.userInfoChange(uid);
+            //userCache.userInfoChange(uid);
         }
+    }
+
+    @Override
+    public List<BadgeResp> badges(Long uid) {
+        //查询所有徽章
+        List<ItemConfig> itemConfigs = itemCache.getByType(ItemTypeEnum.BADGE.getType());
+        //查询用户拥有的徽章
+        List<UserBackpack> backpacks = userBackpackDao.getByItemIds(uid, itemConfigs.stream().map(ItemConfig::getId).collect(Collectors.toList()));
+        //查询用户当前佩戴的标签
+        User user = userDao.getById(uid);
+        return UserAdapter.buildBadgeResp(itemConfigs, backpacks, user);
+    }
+
+    @Override
+    public void wearingBadge(Long uid, WearingBadgeReq req) {
+        //确保有这个徽章
+        UserBackpack firstValidItem = userBackpackDao.getFirstValidItem(uid, req.getBadgeId());
+        AssertUtil.isNotEmpty(firstValidItem, "您没有这个徽章哦，快去达成条件获取吧");
+        //确保物品类型是徽章
+        ItemConfig itemConfig = itemConfigDao.getById(firstValidItem.getItemId());
+        AssertUtil.equal(itemConfig.getType(), ItemTypeEnum.BADGE.getType(), "该徽章不可佩戴");
+        //佩戴徽章
+        userDao.wearingBadge(uid, req.getBadgeId());
+        //删除用户缓存
+        //userCache.userInfoChange(uid);
     }
 }
