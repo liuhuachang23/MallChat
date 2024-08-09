@@ -13,7 +13,7 @@ import java.util.List;
  * 功能物品配置表 服务实现类
  * </p>
  *
- * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @author <a href="https://github.com/liuhuachang23/MallChat">lhc</a>
  * @since 2024-07-20
  */
 @Service

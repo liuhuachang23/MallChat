@@ -4,9 +4,12 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.lhc.mallchat.common.common.config.ThreadPoolConfig;
 import com.lhc.mallchat.common.common.event.UserOnlineEvent;
 import com.lhc.mallchat.common.user.dao.UserDao;
 import com.lhc.mallchat.common.user.domain.entity.User;
+import com.lhc.mallchat.common.user.domain.enums.RoleEnum;
+import com.lhc.mallchat.common.user.service.IRoleService;
 import com.lhc.mallchat.common.user.service.LoginService;
 import com.lhc.mallchat.common.websocket.NettyUtil;
 import com.lhc.mallchat.common.websocket.domain.vo.resp.WSBaseResp;
@@ -19,8 +22,10 @@ import lombok.SneakyThrows;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -46,12 +51,17 @@ public class WebSocketServiceImpl implements WebSocketService {
     @Autowired
     private LoginService loginService;
     @Autowired
+    private IRoleService roleService;
+    @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
+    @Autowired
+    @Qualifier(ThreadPoolConfig.WS_EXECUTOR)
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     /**
      * 管理所有在线用户的链接（登录态/游客）
      */
-    private static final ConcurrentHashMap<Channel, WSChannelExtraDTO> ONLINE_WE_MAP = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Channel, WSChannelExtraDTO> ONLINE_WS_MAP = new ConcurrentHashMap<>();
 
     public static final int MAXIMUM_SIZE = 1000;
     public static final Duration DURATION = Duration.ofHours(1);
@@ -65,7 +75,7 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     @Override
     public void connect(Channel channel) {
-        ONLINE_WE_MAP.put(channel, new WSChannelExtraDTO());
+        ONLINE_WS_MAP.put(channel, new WSChannelExtraDTO());
     }
 
     @SneakyThrows
@@ -81,7 +91,7 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     @Override
     public void remove(Channel channel) {
-        ONLINE_WE_MAP.remove(channel);
+        ONLINE_WS_MAP.remove(channel);
         //todo 用户下线
     }
 
@@ -124,12 +134,22 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     }
 
+    @Override
+    public void sendToAllOnline(WSBaseResp<?> wsBaseResp, Long skipUid) {
+        ONLINE_WS_MAP.forEach((channel, ext) -> {
+            if (Objects.nonNull(skipUid) && Objects.equals(ext.getUid(), skipUid)) {
+                return;
+            }
+            threadPoolTaskExecutor.execute(() -> sendMsg(channel, wsBaseResp));
+        });
+    }
+
     private void loginSuccess(Channel channel, User user, String token) {
         //保存channel对应的uid
-        WSChannelExtraDTO wsChannelExtraDTO = ONLINE_WE_MAP.get(channel);
+        WSChannelExtraDTO wsChannelExtraDTO = ONLINE_WS_MAP.get(channel);
         wsChannelExtraDTO.setUid(user.getId());
         //发送一个登录成功的消息
-        sendMsg(channel,WebSocketAdapter.buildResp(user,token));
+        sendMsg(channel,WebSocketAdapter.buildResp(user,token,roleService.hasPower(user.getId(), RoleEnum.CHAT_MANAGER)));
         //用户上线成功的事件
         user.setLastOptTime(new Date());
         user.refreshIp(NettyUtil.getAttr(channel, NettyUtil.IP));

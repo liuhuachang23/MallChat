@@ -8,7 +8,7 @@ import java.util.Objects;
 
 /**
  * Description:
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: <a href="https://github.com/liuhuachang23/MallChat">lhc</a>
  * Date: 2023-04-18
  */
 @Data

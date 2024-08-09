@@ -1,12 +1,11 @@
 package com.lhc.mallchat.common.websocket.service.adapter;
 
+import com.lhc.mallchat.common.common.domain.enums.YesOrNoEnum;
 import com.lhc.mallchat.common.user.domain.entity.User;
 import com.lhc.mallchat.common.websocket.domain.enums.WSRespTypeEnum;
 import com.lhc.mallchat.common.websocket.domain.vo.resp.WSBaseResp;
 import com.lhc.mallchat.common.websocket.domain.vo.resp.WSLoginSuccess;
 import com.lhc.mallchat.common.websocket.domain.vo.resp.WSLoginUrl;
-import lombok.Data;
-import me.chanjar.weixin.mp.api.WxMpQrcodeService;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 
 /**
@@ -27,13 +26,14 @@ public class WebSocketAdapter {
     }
 
     //登录成功
-    public static WSBaseResp<?> buildResp(User user, String token) {
+    public static WSBaseResp<?> buildResp(User user, String token, boolean power) {
         WSBaseResp<WSLoginSuccess> resp = new WSBaseResp<>();
         resp.setType(WSRespTypeEnum.LOGIN_SUCCESS.getType());
         WSLoginSuccess wsLoginSuccess = WSLoginSuccess.builder()
                 .avatar(user.getAvatar())
                 .token(token)
                 .uid(user.getId())
+                .power(power ? YesOrNoEnum.YES.getStatus() : YesOrNoEnum.NO.getStatus())
                 .build();
         resp.setData(wsLoginSuccess);
         return resp;

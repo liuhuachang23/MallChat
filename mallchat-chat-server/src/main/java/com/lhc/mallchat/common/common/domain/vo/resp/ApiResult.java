@@ -7,7 +7,7 @@ import lombok.Data;
 
 /**
  * Description: 通用返回体
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: <a href="https://github.com/liuhuachang23/MallChat">lhc</a>
  * Date: 2023-03-23
  */
 @Data

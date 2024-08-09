@@ -1,5 +1,7 @@
 package com.lhc.mallchat.common.websocket.service;
 
+import com.lhc.mallchat.common.websocket.domain.vo.resp.WSBaseResp;
+import com.lhc.mallchat.common.websocket.domain.vo.resp.WSBlack;
 import io.netty.channel.Channel;
 
 /**
@@ -22,4 +24,6 @@ public interface WebSocketService {
     void withAuthorize(Integer code);
 
     void authorize(Channel channel, String token);
+
+    void sendToAllOnline(WSBaseResp<?> wsBaseResp, Long skipUid);
 }

@@ -17,7 +17,7 @@ import java.lang.reflect.Method;
 
 /**
  * Description: 分布式锁切面
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: <a href="https://github.com/liuhuachang23/MallChat">lhc</a>
  * Date: 2023-04-20
  */
 @Slf4j

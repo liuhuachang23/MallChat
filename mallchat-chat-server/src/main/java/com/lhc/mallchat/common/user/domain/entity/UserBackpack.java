@@ -15,7 +15,7 @@ import lombok.*;
  * 用户背包表
  * </p>
  *
- * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @author <a href="https://github.com/liuhuachang23/MallChat">lhc</a>
  * @since 2024-07-20
  */
 @Data

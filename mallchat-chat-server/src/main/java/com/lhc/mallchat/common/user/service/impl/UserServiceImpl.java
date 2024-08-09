@@ -1,16 +1,19 @@
 package com.lhc.mallchat.common.user.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.lhc.App;
+import com.lhc.mallchat.common.common.event.UserBlackEvent;
 import com.lhc.mallchat.common.common.event.UserRegisterEvent;
 import com.lhc.mallchat.common.common.utils.AssertUtil;
+import com.lhc.mallchat.common.user.dao.BlackDao;
 import com.lhc.mallchat.common.user.dao.ItemConfigDao;
 import com.lhc.mallchat.common.user.dao.UserBackpackDao;
 import com.lhc.mallchat.common.user.dao.UserDao;
-import com.lhc.mallchat.common.user.domain.entity.ItemConfig;
-import com.lhc.mallchat.common.user.domain.entity.User;
-import com.lhc.mallchat.common.user.domain.entity.UserBackpack;
+import com.lhc.mallchat.common.user.domain.entity.*;
+import com.lhc.mallchat.common.user.domain.enums.BlackTypeEnum;
 import com.lhc.mallchat.common.user.domain.enums.ItemEnum;
 import com.lhc.mallchat.common.user.domain.enums.ItemTypeEnum;
+import com.lhc.mallchat.common.user.domain.vo.req.BlackReq;
 import com.lhc.mallchat.common.user.domain.vo.req.ModifyNameReq;
 import com.lhc.mallchat.common.user.domain.vo.req.WearingBadgeReq;
 import com.lhc.mallchat.common.user.domain.vo.resp.BadgeResp;
@@ -18,6 +21,7 @@ import com.lhc.mallchat.common.user.domain.vo.resp.UserInfoResp;
 import com.lhc.mallchat.common.user.service.IUserService;
 import com.lhc.mallchat.common.user.service.adapter.UserAdapter;
 import com.lhc.mallchat.common.user.service.cache.ItemCache;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -25,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -34,6 +39,7 @@ import java.util.stream.Collectors;
  * @Date 2024/7/7 9:34
  * @Version 1.0
  */
+@Slf4j
 @Service
 public class UserServiceImpl implements IUserService {
 
@@ -45,6 +51,8 @@ public class UserServiceImpl implements IUserService {
     private ItemCache itemCache;
     @Autowired
     private ItemConfigDao itemConfigDao;
+    @Autowired
+    private BlackDao blackDao;
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -108,5 +116,32 @@ public class UserServiceImpl implements IUserService {
         userDao.wearingBadge(uid, req.getBadgeId());
         //删除用户缓存
         //userCache.userInfoChange(uid);
+    }
+
+    @Override
+    public void black(BlackReq req) {
+        Long uid = req.getUid();
+        Black black = new Black();
+        black.setTarget(uid.toString());
+        black.setType(BlackTypeEnum.UID.getType());
+        blackDao.save(black);
+        User user = userDao.getById(uid);
+        blackIp(Optional.ofNullable(user.getIpInfo()).map(IpInfo::getCreateIp).orElse(null));
+        blackIp(Optional.ofNullable(user.getIpInfo()).map(IpInfo::getUpdateIp).orElse(null));
+        applicationEventPublisher.publishEvent(new UserBlackEvent(this, user));
+    }
+
+    public void blackIp(String ip) {
+        if (StrUtil.isBlank(ip)) {
+            return;
+        }
+        try {
+            Black user = new Black();
+            user.setTarget(ip);
+            user.setType(BlackTypeEnum.IP.getType());
+            blackDao.save(user);
+        } catch (Exception e) {
+            log.error("duplicate black ip:{}", ip);
+        }
     }
 }

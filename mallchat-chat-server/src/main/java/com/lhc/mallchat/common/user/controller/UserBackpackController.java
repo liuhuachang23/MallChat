@@ -10,7 +10,7 @@ import org.springframework.stereotype.Controller;
  * 用户背包表 前端控制器
  * </p>
  *
- * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @author <a href="https://github.com/liuhuachang23/MallChat">lhc</a>
  * @since 2024-07-20
  */
 @Controller

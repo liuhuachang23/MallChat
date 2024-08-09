@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
  * 功能物品配置表
  * </p>
  *
- * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @author <a href="https://github.com/liuhuachang23/MallChat">lhc</a>
  * @since 2024-07-20
  */
 @Data

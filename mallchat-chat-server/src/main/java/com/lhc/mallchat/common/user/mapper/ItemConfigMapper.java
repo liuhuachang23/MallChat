@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * 功能物品配置表 Mapper 接口
  * </p>
  *
- * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @author <a href="https://github.com/liuhuachang23/MallChat">lhc</a>
  * @since 2024-07-20
  */
 public interface ItemConfigMapper extends BaseMapper<ItemConfig> {

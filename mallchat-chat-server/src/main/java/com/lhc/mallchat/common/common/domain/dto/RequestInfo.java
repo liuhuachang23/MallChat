@@ -4,7 +4,7 @@ import lombok.Data;
 
 /**
  * Description: web请求信息收集类
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: <a href="https://github.com/liuhuachang23/MallChat">lhc</a>
  * Date: 2023-04-05
  */
 @Data

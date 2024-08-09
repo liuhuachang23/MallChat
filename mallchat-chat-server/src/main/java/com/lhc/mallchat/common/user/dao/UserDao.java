@@ -1,5 +1,6 @@
 package com.lhc.mallchat.common.user.dao;
 
+import com.lhc.mallchat.common.common.domain.enums.YesOrNoEnum;
 import com.lhc.mallchat.common.user.domain.entity.User;
 import com.lhc.mallchat.common.user.mapper.UserMapper;
 import com.lhc.mallchat.common.user.service.IUserService;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Service;
  * 用户表 服务实现类
  * </p>
  *
- * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @author <a href="https://github.com/liuhuachang23/MallChat">lhc</a>
  * @since 2024-06-17
  */
 @Service
@@ -39,4 +40,9 @@ public class UserDao extends ServiceImpl<UserMapper, User> {
         updateById(update);
     }
 
+    public void invalidUid(Long id) {
+        lambdaUpdate().eq(User::getId, id)
+                .set(User::getStatus, YesOrNoEnum.YES.getStatus())
+                .update();
+    }
 }

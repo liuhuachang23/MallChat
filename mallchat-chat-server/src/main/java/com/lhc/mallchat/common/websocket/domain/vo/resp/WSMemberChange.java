@@ -10,7 +10,7 @@ import java.util.Date;
 
 /**
  * Description:
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: <a href="https://github.com/liuhuachang23/MallChat">lhc</a>
  * Date: 2023-03-19
  */
 @Data

@@ -3,13 +3,17 @@ package com.lhc.mallchat.common.user.controller;
 
 import cn.hutool.db.PageResult;
 import com.lhc.mallchat.common.common.domain.vo.resp.ApiResult;
+import com.lhc.mallchat.common.common.utils.AssertUtil;
 import com.lhc.mallchat.common.common.utils.RequestHolder;
 import com.lhc.mallchat.common.user.dao.UserDao;
 import com.lhc.mallchat.common.user.domain.entity.User;
+import com.lhc.mallchat.common.user.domain.enums.RoleEnum;
+import com.lhc.mallchat.common.user.domain.vo.req.BlackReq;
 import com.lhc.mallchat.common.user.domain.vo.req.ModifyNameReq;
 import com.lhc.mallchat.common.user.domain.vo.req.WearingBadgeReq;
 import com.lhc.mallchat.common.user.domain.vo.resp.BadgeResp;
 import com.lhc.mallchat.common.user.domain.vo.resp.UserInfoResp;
+import com.lhc.mallchat.common.user.service.IRoleService;
 import com.lhc.mallchat.common.user.service.IUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,7 +31,7 @@ import java.util.List;
  * 用户表 前端控制器
  * </p>
  *
- * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @author <a href="https://github.com/liuhuachang23/MallChat">lhc</a>
  * @since 2024-06-17
  */
 @RestController
@@ -38,6 +42,9 @@ public class UserController {
 
     @Resource
     private IUserService userService;
+
+    @Resource
+    private IRoleService iRoleService;
 
     @GetMapping("/userInfo")
     @ApiOperation("用户详情")
@@ -62,6 +69,16 @@ public class UserController {
     @ApiOperation("佩戴徽章")
     public ApiResult<Void> wearingBadge(@Valid @RequestBody WearingBadgeReq req) {
         userService.wearingBadge(RequestHolder.get().getUid(), req);
+        return ApiResult.success();
+    }
+
+    @PutMapping("/black")
+    @ApiOperation("拉黑用户")
+    public ApiResult<Void> black(@Valid @RequestBody BlackReq req) {
+        Long uid = RequestHolder.get().getUid();
+        boolean hasPower = iRoleService.hasPower(uid, RoleEnum.ADMIN);
+        AssertUtil.isTrue(hasPower, "没有权限");
+        userService.black(req);
         return ApiResult.success();
     }
 }
